@@ -38,10 +38,10 @@ public class App {
 		logger.log(Level.INFO, "******** Starting the Listener ********");
 		// System.out.println( "******** Starting the Listener ********" );
 
-		testOutput();
+		outputHandler();
 	}
 
-	private static void testOutput() {
+	private static void outputHandler() {
 		try {
 			Console console = System.console();
 
