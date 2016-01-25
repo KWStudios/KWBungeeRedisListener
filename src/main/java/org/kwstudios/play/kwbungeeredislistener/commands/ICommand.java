@@ -2,6 +2,12 @@ package org.kwstudios.play.kwbungeeredislistener.commands;
 
 import java.util.ArrayList;
 
+/**
+ * The interface which should be implemented by every Command.
+ * 
+ * @author Koray
+ *
+ */
 public interface ICommand {
 
 	/**
@@ -18,6 +24,13 @@ public interface ICommand {
 	 * @return The ArrayList with all possible arguments.
 	 */
 	public ArrayList<String> getArguments();
+
+	/**
+	 * Returns a List which holds each line of the description for the Command.
+	 * 
+	 * @return An ArrayList with one line description per value.
+	 */
+	public ArrayList<String> getDescription();
 
 	/**
 	 * Starts executing the Command with the given arguments.
