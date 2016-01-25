@@ -2,6 +2,7 @@ package org.kwstudios.play.kwbungeeredislistener.commands;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.kwstudios.play.kwbungeeredislistener.App;
 
@@ -14,7 +15,7 @@ public class ShutdownCommand implements ICommand {
 
 	@Override
 	public ArrayList<String> getArguments() {
-		String[] args = {};
+		String[] args = { "--help" };
 		return new ArrayList<String>(Arrays.asList(args));
 	}
 
@@ -31,7 +32,7 @@ public class ShutdownCommand implements ICommand {
 	}
 
 	@Override
-	public boolean execute(ArrayList<String> args) {
+	public boolean execute(List<String> args) {
 		App.getJedisChannelListener().getJedisPubSub().unsubscribe();
 		System.exit(0);
 		return true;

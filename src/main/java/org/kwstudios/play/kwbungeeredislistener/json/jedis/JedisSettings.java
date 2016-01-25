@@ -1,5 +1,7 @@
 package org.kwstudios.play.kwbungeeredislistener.json.jedis;
 
+import redis.clients.jedis.Protocol;
+
 public class JedisSettings {
 
 	private String host;
@@ -17,19 +19,19 @@ public class JedisSettings {
 	}
 
 	public String getHost() {
-		return host;
+		return (host == null) ? Protocol.DEFAULT_HOST : host;
 	}
 
 	public String getPassword() {
-		return password;
+		return (password == null) ? "" : password;
 	}
 
 	public String[] getChannelsToListen() {
-		return channels_to_listen;
+		return (channels_to_listen == null) ? new String[] {} : channels_to_listen;
 	}
 
 	public int getPort() {
-		return port;
+		return (port == 0) ? Protocol.DEFAULT_PORT : port;
 	}
 
 }

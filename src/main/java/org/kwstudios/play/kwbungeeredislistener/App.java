@@ -12,6 +12,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -21,6 +23,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import org.kwstudios.play.kwbungeeredislistener.commands.ICommand;
+import org.kwstudios.play.kwbungeeredislistener.commands.SendRedisMessageCommand;
+import org.kwstudios.play.kwbungeeredislistener.commands.ShutdownCommand;
 import org.kwstudios.play.kwbungeeredislistener.json.Settings;
 import org.kwstudios.play.kwbungeeredislistener.json.jedis.JedisSettings;
 import org.kwstudios.play.kwbungeeredislistener.listener.JedisMessageListener;
@@ -45,12 +50,16 @@ public class App {
 
 	private static JedisMessageListener jedisChannelListener = null;
 
+	private static List<ICommand> allCommands = new ArrayList<ICommand>();
+
 	public static void main(String[] args) {
 		setupLogger();
 
 		logger.log(Level.INFO, "******** Starting the Listener ********");
-		reloadJedisConfig();
+		reloadSettingsFile();
 		setupJedisListener();
+
+		setupCommands();
 
 		outputHandler();
 	}
@@ -71,7 +80,7 @@ public class App {
 		logger.addHandler(handler);
 	}
 
-	private static void reloadJedisConfig() {
+	private static void reloadSettingsFile() {
 		Gson gson = new Gson();
 
 		URL url = App.class.getProtectionDomain().getCodeSource().getLocation();
@@ -102,11 +111,15 @@ public class App {
 			createDefaultSettingsFileAndExit(file);
 		}
 
-		JedisSettings jedis = gson.fromJson(reader, JedisSettings.class);
-		settings.setJedis(jedis);
+		// JedisSettings jedis = gson.fromJson(reader, JedisSettings.class);
+		// settings.setJedis(jedis);
+		settings = gson.fromJson(reader, Settings.class);
 	}
 
 	private static void setupJedisListener() {
+		logger.info(settings.getJedis().getHost());
+		logger.info(settings.getJedis().getPassword());
+		logger.info(Integer.toString(settings.getJedis().getPort()));
 		App.jedisChannelListener = new JedisMessageListener(settings.getJedis().getHost(),
 				settings.getJedis().getPort(),
 				settings.getJedis().getPassword().isEmpty() ? null : settings.getJedis().getPassword(),
@@ -114,6 +127,7 @@ public class App {
 			@Override
 			public synchronized void taskOnMessageReceive(String channel, String message) {
 				logger.info("Message received, trying to parse it gracefully...");
+				logger.info("Message received: " + message + "Channel: " + channel);
 				// TODO Call new method which parses the message
 			}
 		};
@@ -130,6 +144,24 @@ public class App {
 
 				while (scanner.hasNext()) {
 					String str = scanner.next();
+
+					String[] splitted = str.split("\\s+");
+					if (splitted.length > 0) {
+
+						List<String> args = new ArrayList<String>();
+						for (int i = 0; i < splitted.length; i++) {
+							if (i != 0) {
+								args.add(splitted[i]);
+							}
+						}
+						// TODO Dynamic testing for the label through all
+						// ICommands
+						if (splitted[0].trim().equalsIgnoreCase(allCommands.get(0).getLabel())) {
+							allCommands.get(0).execute(args);
+						}
+
+					}
+
 					logger.info(str);
 					System.out.print(">");
 				}
@@ -178,6 +210,10 @@ public class App {
 		}
 	}
 
+	private static void setupCommands() {
+		allCommands.add(new SendRedisMessageCommand());
+	}
+
 	public static Logger getLogger() {
 		return logger;
 	}
@@ -188,6 +224,10 @@ public class App {
 
 	public static JedisMessageListener getJedisChannelListener() {
 		return jedisChannelListener;
+	}
+
+	public static List<ICommand> getAllCommands() {
+		return allCommands;
 	}
 
 }

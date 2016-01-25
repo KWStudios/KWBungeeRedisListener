@@ -1,6 +1,7 @@
 package org.kwstudios.play.kwbungeeredislistener.commands;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The interface which should be implemented by every Command.
@@ -47,6 +48,6 @@ public interface ICommand {
 	 * 
 	 * @return False iff the execution fails, else true.
 	 */
-	public boolean execute(ArrayList<String> args);
+	public boolean execute(List<String> args);
 
 }
