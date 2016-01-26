@@ -1,7 +1,9 @@
 package org.kwstudios.play.kwbungeeredislistener.commands;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
+
+import org.kwstudios.play.kwbungeeredislistener.commands.docs.ICommandDocs;
 
 /**
  * The interface which should be implemented by every Command.
@@ -34,6 +36,14 @@ public interface ICommand {
 	public ArrayList<String> getDescription();
 
 	/**
+	 * Returns an instance of ICommandDocs, which should represent the command
+	 * line documentation for this command.
+	 * 
+	 * @return The instance of ICommandDocs associated with this Command.
+	 */
+	public ICommandDocs getCommandDocs();
+
+	/**
 	 * Starts executing the Command with the given arguments.
 	 * <p>
 	 * Returns {@code false} iff the execution fails instantly, else
@@ -48,6 +58,6 @@ public interface ICommand {
 	 * 
 	 * @return False iff the execution fails, else true.
 	 */
-	public boolean execute(List<String> args);
+	public boolean execute(Map<String, Object> args);
 
 }

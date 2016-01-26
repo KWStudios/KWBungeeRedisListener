@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -26,6 +27,7 @@ import java.util.regex.Pattern;
 import org.kwstudios.play.kwbungeeredislistener.commands.ICommand;
 import org.kwstudios.play.kwbungeeredislistener.commands.SendRedisMessageCommand;
 import org.kwstudios.play.kwbungeeredislistener.commands.ShutdownCommand;
+import org.kwstudios.play.kwbungeeredislistener.commands.docs.SendRedisMessageDocs;
 import org.kwstudios.play.kwbungeeredislistener.json.Settings;
 import org.kwstudios.play.kwbungeeredislistener.json.jedis.JedisSettings;
 import org.kwstudios.play.kwbungeeredislistener.listener.JedisMessageListener;
@@ -148,16 +150,28 @@ public class App {
 					String[] splitted = str.split("\\s+");
 					if (splitted.length > 0) {
 
-						List<String> args = new ArrayList<String>();
-						for (int i = 0; i < splitted.length; i++) {
-							if (i != 0) {
-								args.add(splitted[i]);
+						if (splitted[0].trim().equalsIgnoreCase("kw")) {
+
+							List<String> args = new ArrayList<String>();
+							for (int i = 0; i < splitted.length; i++) {
+								if (i != 0) {
+									args.add(splitted[i]);
+								}
 							}
-						}
-						// TODO Dynamic testing for the label through all
-						// ICommands
-						if (splitted[0].trim().equalsIgnoreCase(allCommands.get(0).getLabel())) {
-							allCommands.get(0).execute(args);
+
+							SendRedisMessageDocs doc = new SendRedisMessageDocs();
+							doc.getDocopt().withExit(false);
+							System.out.println(doc.getDoc());
+							Map<String, Object> result = doc.getDocopt().parse(args);
+							System.out.println("DocsChannel: " + result.get("<channel>"));
+							System.out.println("DocsMessage: " + result.get("<message>"));
+
+							// TODO Dynamic testing for the label through all
+							// ICommands
+							if (splitted[1].trim().equalsIgnoreCase(allCommands.get(0).getLabel())) {
+								allCommands.get(0).execute(result);
+							}
+
 						}
 
 					}
@@ -212,6 +226,7 @@ public class App {
 
 	private static void setupCommands() {
 		allCommands.add(new SendRedisMessageCommand());
+		allCommands.add(new ShutdownCommand());
 	}
 
 	public static Logger getLogger() {

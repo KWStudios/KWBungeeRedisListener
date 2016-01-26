@@ -2,12 +2,20 @@ package org.kwstudios.play.kwbungeeredislistener.commands;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Map;
 
 import org.kwstudios.play.kwbungeeredislistener.App;
+import org.kwstudios.play.kwbungeeredislistener.commands.docs.ICommandDocs;
+import org.kwstudios.play.kwbungeeredislistener.commands.docs.SendRedisMessageDocs;
 import org.kwstudios.play.kwbungeeredislistener.sender.JedisMessageSender;
 
 public class SendRedisMessageCommand implements ICommand {
+
+	private ICommandDocs documentation;
+
+	public SendRedisMessageCommand() {
+		this.documentation = new SendRedisMessageDocs();
+	}
 
 	@Override
 	public String getLabel() {
@@ -22,79 +30,33 @@ public class SendRedisMessageCommand implements ICommand {
 
 	@Override
 	public ArrayList<String> getDescription() {
-		String first = "This command sends a message to the given channel.";
-		String second = "Usage: send [--host=<host>] [--port=<port>] [--password=<password>] <channel> <message>";
-		String third = "Options: <none>";
-		ArrayList<String> list = new ArrayList<String>();
-		list.add(first);
-		list.add(second);
-		list.add(third);
-		return list;
+		return new ArrayList<String>(Arrays.asList(documentation.getDoc().split("\\n")));
 	}
 
 	@Override
-	public boolean execute(List<String> args) {
-		String host = App.getSettings().getJedis().getHost();
-		int port = App.getSettings().getJedis().getPort();
-		String password = App.getSettings().getJedis().getPassword();
+	public ICommandDocs getCommandDocs() {
+		return documentation;
+	}
 
-		List<String> arguments = new ArrayList<String>();
-		String channel = null;
-		String message = null;
-		for (String arg : args) {
-			if (arg.trim().toLowerCase().startsWith("--host")) {
-				if (!arguments.isEmpty()) {
-					return false;
-				}
-				String[] hostArray = arg.split("=");
-				if (hostArray.length < 2) {
-					return false;
-				}
-				host = hostArray[1];
-			} else if (arg.trim().toLowerCase().startsWith("--port")) {
-				if (!arguments.isEmpty()) {
-					return false;
-				}
-				String[] portArray = arg.split("=");
-				if (portArray.length < 2) {
-					return false;
-				}
-				try {
-					port = Integer.parseInt(portArray[1]);
-				} catch (NumberFormatException e) {
-					return false;
-				}
-			} else if (arg.trim().toLowerCase().startsWith("--password")) {
-				if (!arguments.isEmpty()) {
-					return false;
-				}
-				String[] passwordArray = arg.split("=");
-				if (passwordArray.length < 2) {
-					return false;
-				}
-				password = passwordArray[1];
-			} else {
-				if (arg.trim().toLowerCase().startsWith("--")) {
-					return false;
-				}
-				arguments.add(arg);
+	@Override
+	public boolean execute(Map<String, Object> args) {
+		String host = (args.get("--host") instanceof String) ? (String) args.get("--host")
+				: App.getSettings().getJedis().getHost();
+		int port = (args.get("--port") instanceof Integer) ? (Integer) args.get("--port")
+				: App.getSettings().getJedis().getPort();
+		String password = (args.get("--password") instanceof String) ? (String) args.get("--password")
+				: App.getSettings().getJedis().getPassword();
 
-				if (arguments.size() > 2) {
-					return false;
-				}
-			}
+		String channel = (args.get("<channel>") instanceof String) ? (String) args.get("<channel>") : null;
+		String message = (args.get("<message>") instanceof String) ? (String) args.get("<message>") : null;
+		;
+
+		if (channel != null && message != null) {
+			JedisMessageSender.sendMessageToChannel(host, port, password, channel, message);
+			return true;
 		}
 
-		if (arguments.size() != 2) {
-			return false;
-		}
-
-		channel = arguments.get(0);
-		message = arguments.get(1);
-
-		JedisMessageSender.sendMessageToChannel(host, port, password, channel, message);
-
-		return true;
+		return false;
 	}
 
 }

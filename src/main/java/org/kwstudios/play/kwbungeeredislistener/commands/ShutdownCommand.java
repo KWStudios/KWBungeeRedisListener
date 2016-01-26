@@ -2,11 +2,19 @@ package org.kwstudios.play.kwbungeeredislistener.commands;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Map;
 
 import org.kwstudios.play.kwbungeeredislistener.App;
+import org.kwstudios.play.kwbungeeredislistener.commands.docs.ICommandDocs;
+import org.kwstudios.play.kwbungeeredislistener.commands.docs.ShutdownCommandDocs;
 
 public class ShutdownCommand implements ICommand {
+
+	private ICommandDocs documentation;
+
+	public ShutdownCommand() {
+		documentation = new ShutdownCommandDocs();
+	}
 
 	@Override
 	public String getLabel() {
@@ -21,18 +29,16 @@ public class ShutdownCommand implements ICommand {
 
 	@Override
 	public ArrayList<String> getDescription() {
-		String first = "This command shuts down the application, quitting everything associated with it.";
-		String second = "Usage: end";
-		String third = "Options: <none>";
-		ArrayList<String> list = new ArrayList<String>();
-		list.add(first);
-		list.add(second);
-		list.add(third);
-		return list;
+		return new ArrayList<String>(Arrays.asList(documentation.getDoc().split("\\n")));
 	}
 
 	@Override
-	public boolean execute(List<String> args) {
+	public ICommandDocs getCommandDocs() {
+		return documentation;
+	}
+
+	@Override
+	public boolean execute(Map<String, Object> args) {
 		App.getJedisChannelListener().getJedisPubSub().unsubscribe();
 		System.exit(0);
 		return true;
