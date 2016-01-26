@@ -15,6 +15,8 @@ public class SendRedisMessageDocs implements ICommandDocs {
 
 	public SendRedisMessageDocs() {
 		docopt = new Docopt(doc);
+		docopt.withExit(false);
+		docopt.withHelp(false);
 	}
 
 	@Override

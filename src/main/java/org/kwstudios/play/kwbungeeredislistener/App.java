@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import org.docopt.DocoptExitException;
 import org.kwstudios.play.kwbungeeredislistener.commands.ICommand;
 import org.kwstudios.play.kwbungeeredislistener.commands.SendRedisMessageCommand;
 import org.kwstudios.play.kwbungeeredislistener.commands.ShutdownCommand;
@@ -140,7 +141,7 @@ public class App {
 			Console console = System.console();
 
 			if (console != null) {
-				System.out.print(">");
+				// System.out.print(">");
 				Scanner scanner = new Scanner(console.reader());
 				scanner.useDelimiter(Pattern.compile("[\r\n]+"));
 
@@ -159,25 +160,24 @@ public class App {
 								}
 							}
 
-							SendRedisMessageDocs doc = new SendRedisMessageDocs();
-							doc.getDocopt().withExit(false);
-							System.out.println(doc.getDoc());
-							Map<String, Object> result = doc.getDocopt().parse(args);
-							System.out.println("DocsChannel: " + result.get("<channel>"));
-							System.out.println("DocsMessage: " + result.get("<message>"));
-
-							// TODO Dynamic testing for the label through all
-							// ICommands
-							if (splitted[1].trim().equalsIgnoreCase(allCommands.get(0).getLabel())) {
-								allCommands.get(0).execute(result);
+							for (ICommand command : allCommands) {
+								if (splitted[1].trim().equalsIgnoreCase(command.getLabel())) {
+									try {
+										Map<String, Object> result = command.getCommandDocs().getDocopt().parse(args);
+										if (!command.execute(result)) {
+											logger.info("\n" + command.getCommandDocs().getDoc());
+										}
+									} catch (DocoptExitException e) {
+										logger.info("\n" + command.getCommandDocs().getDoc());
+									}
+								}
 							}
 
 						}
 
 					}
 
-					logger.info(str);
-					System.out.print(">");
+					// System.out.print(">");
 				}
 				scanner.close();
 			} else {

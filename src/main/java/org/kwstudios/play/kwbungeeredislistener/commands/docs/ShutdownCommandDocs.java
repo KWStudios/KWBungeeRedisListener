@@ -11,6 +11,8 @@ public class ShutdownCommandDocs implements ICommandDocs {
 
 	public ShutdownCommandDocs() {
 		docopt = new Docopt(doc);
+		docopt.withExit(false);
+		docopt.withHelp(false);
 	}
 
 	@Override
