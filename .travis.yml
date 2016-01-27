@@ -1,0 +1,31 @@
+language: java
+jdk:
+- oraclejdk7
+script: mvn clean package
+install: true
+notifications:
+  email:
+    recipients:
+    - ybrin.development@gmail.com
+    - simon.artner@gmail.com
+    on_success: change
+    on_failure: always
+  webhooks: https://api.kwstudios.org/travis/webhooks/versions
+before_deploy:
+- ls
+- cd target/
+- ls
+- cd ..
+deploy:
+  provider: gcs
+  access_key_id: GOOGOORZ55TL3TFGHJHZ
+  secret_access_key:
+    secure: ML09vAKD2atQlb/xG0s516CAjwjX97k9uOrGRBtkCRNNDRibZ3bNxK0HqsPAU5qY8EVZvc/mdaNnyoBbWqtAKYlB6dgftxfyFhn+Og2rLIYkf0C5ES0zijy/7bgqLpAtv+tx3uiIFrQKszA4dCc/EI09uqDhnlXVNSpGorl9gie9bvLRvhJEd2M/wAJXdYKkGVzA11I0LqOX0g5DtphzJ4MYFysrDZFpoo4EYpdQIgz+WVqYFidcBET0TLYclbr3kS47PZizrYIlOlmuE890eh8NnoiWq4nKsC/8MsQhzFajwBwrXJLZzaimvVH452quYf+wwW6AR0zFOYvrq5eaN9ipvxzqs1KCvh20WfG2tW3QbMYSCXLbc/gs0qkwFdlVFEcVXvQQ01xO+Zb6VAT0mQwOYA17OeYyVG+Oe6VHFBbRaLaO8Utnq1cElAZb12hgUPmg8r4ZXgPF3RHIhrqeGE+t8sH/MiptqInGzj8eO7jcH6yAgiLs13fUOm00hQJ/aNPpzTGLztg84w9STIC9tqlyw5PtkjN7M3dlmVao+YeYyji5IPGDcZDMK7rsiCQ3UeXDwcDnV6T2AVTZBAENIExRFlfdJtyDNhqYnwy/Vyagl5HsDkdcj0nddTBtN7B0rgV0t6N7nP3pS+0Gg/owY3V7QXkg7TI5D6tDe7+TKss=
+  file_glob: true
+  bucket: kwstudios-main-bucket
+  local-dir: "${HOME}/build/${TRAVIS_REPO_SLUG}/target"
+  upload-dir: travis/kwbungeeredislistener/${TRAVIS_BUILD_NUMBER}
+  skip_cleanup: true
+  acl: public-read
+  on:
+    repo: KWStudios/KWBungeeRedisListener

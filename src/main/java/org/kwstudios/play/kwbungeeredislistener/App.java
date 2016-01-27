@@ -28,15 +28,12 @@ import org.docopt.DocoptExitException;
 import org.kwstudios.play.kwbungeeredislistener.commands.ICommand;
 import org.kwstudios.play.kwbungeeredislistener.commands.SendRedisMessageCommand;
 import org.kwstudios.play.kwbungeeredislistener.commands.ShutdownCommand;
-import org.kwstudios.play.kwbungeeredislistener.commands.docs.SendRedisMessageDocs;
 import org.kwstudios.play.kwbungeeredislistener.json.Settings;
-import org.kwstudios.play.kwbungeeredislistener.json.jedis.JedisSettings;
 import org.kwstudios.play.kwbungeeredislistener.listener.JedisMessageListener;
+import org.kwstudios.play.kwbungeeredislistener.minigames.MinigameRequests;
 import org.kwstudios.play.kwbungeeredislistener.toolbox.SimpleConsoleFormatter;
 
 import com.google.gson.Gson;
-
-import redis.clients.jedis.Protocol;
 
 /**
  * This is the main class which will handle the console input.
@@ -130,8 +127,9 @@ public class App {
 			@Override
 			public synchronized void taskOnMessageReceive(String channel, String message) {
 				logger.info("Message received, trying to parse it gracefully...");
-				logger.info("Message received: " + message + "Channel: " + channel);
+				logger.info("Message received: " + message + " Channel: " + channel);
 				// TODO Call new method which parses the message
+				MinigameRequests.startRequestedServer(message);
 			}
 		};
 	}
@@ -195,9 +193,7 @@ public class App {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		JedisSettings jedis = new JedisSettings(Protocol.DEFAULT_HOST, "", new String[] { "minigame-server-creation" },
-				Protocol.DEFAULT_PORT);
-		settings.setJedis(jedis);
+
 		String settingsJson = gson.toJson(settings);
 		try {
 			Files.write(Paths.get(file.getAbsolutePath()), settingsJson.getBytes());

@@ -49,6 +49,7 @@
 						<includes>
 							<include>redis.clients:*</include>
 							<include>com.google.code.gson:*</include>
+							<include>com.google.guava:*</include>
 							<include>org.docopt:*</include>
 						</includes>
 					</artifactSet>
@@ -59,6 +60,10 @@
 						</relocation>
 						<relocation>
 							<pattern>com.google.code.gson</pattern>
+							<shadedPattern>org.kwstudios.play.kwbungeeredislistener</shadedPattern>
+						</relocation>
+						<relocation>
+							<pattern>com.google.guava</pattern>
 							<shadedPattern>org.kwstudios.play.kwbungeeredislistener</shadedPattern>
 						</relocation>
 						<relocation>
@@ -136,6 +141,11 @@
 			<version>0.6.0</version>
 			<type>jar</type>
 			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>19.0</version>
 		</dependency>
 	</dependencies>
 </project>
