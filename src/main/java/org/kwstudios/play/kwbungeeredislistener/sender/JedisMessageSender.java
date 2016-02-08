@@ -26,13 +26,14 @@ public class JedisMessageSender {
 			public void run() {
 				try {
 					App.getLogger().info("Jedis is connecting to the Redis Host!");
-					Jedis jedis = new Jedis(server, port);
-					if (password != null) {
-						jedis.auth(password);
-					}
+					Jedis jedis = App.getJedisPool().getResource();
+					// if (password != null) {
+					// jedis.auth(password);
+					// }
 					App.getLogger().info("Jedis is publishing the given Message to the Redis Host!");
 					jedis.publish(channel, message);
-					jedis.quit();
+					jedis.close();
+					// jedis.quit();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

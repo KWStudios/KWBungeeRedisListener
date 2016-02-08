@@ -73,16 +73,17 @@ public abstract class JedisMessageListener {
 			public void run() {
 				try {
 					App.getLogger().info("Jedis is connecting to the Redis Host!");
-					Jedis jedis = new Jedis(server, port);
-					if (password != null) {
-						jedis.auth(password);
-					}
+					Jedis jedis = App.getJedisPool().getResource();
+					// if (password != null) {
+					// jedis.auth(password);
+					// }
 					App.getLogger().info("Jedis is subscribing for a channel at the Redis Host!");
 					jedis.subscribe(jedisPubSub, channel);
-					jedis.quit();
+					// jedis.quit();
 					// jedis.close();
 				} catch (Exception e) {
 					e.printStackTrace();
+					App.setupJedisListener();
 				}
 			}
 		}).start();

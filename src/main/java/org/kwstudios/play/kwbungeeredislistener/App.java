@@ -31,9 +31,13 @@ import org.kwstudios.play.kwbungeeredislistener.commands.ShutdownCommand;
 import org.kwstudios.play.kwbungeeredislistener.json.Settings;
 import org.kwstudios.play.kwbungeeredislistener.listener.JedisMessageListener;
 import org.kwstudios.play.kwbungeeredislistener.minigames.MinigameRequests;
+import org.kwstudios.play.kwbungeeredislistener.toolbox.ShutdownManager;
 import org.kwstudios.play.kwbungeeredislistener.toolbox.SimpleConsoleFormatter;
 
 import com.google.gson.Gson;
+
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 
 /**
  * This is the main class which will handle the console input.
@@ -48,12 +52,15 @@ public class App {
 
 	private static Settings settings = new Settings();
 
+	private static JedisPool jedisPool;
 	private static JedisMessageListener jedisChannelListener = null;
 
 	private static List<ICommand> allCommands = new ArrayList<ICommand>();
 
 	public static void main(String[] args) {
 		setupLogger();
+
+		ShutdownManager.registerShutdownHandler();
 
 		logger.log(Level.INFO, "******** Starting the Listener ********");
 		reloadSettingsFile();
@@ -116,9 +123,19 @@ public class App {
 		settings = gson.fromJson(reader, Settings.class);
 	}
 
-	private static void setupJedisListener() {
+	public void setupJedisPool() {
+		JedisPoolConfig poolConfig = new JedisPoolConfig();
+		if (settings.getJedis().getPassword() == null || settings.getJedis().getPassword().isEmpty()) {
+			jedisPool = new JedisPool(poolConfig, settings.getJedis().getHost(), settings.getJedis().getPort(), 0);
+		} else {
+			jedisPool = new JedisPool(poolConfig, settings.getJedis().getHost(), settings.getJedis().getPort(), 0,
+					settings.getJedis().getPassword());
+
+		}
+	}
+
+	public static void setupJedisListener() {
 		logger.info(settings.getJedis().getHost());
-		logger.info(settings.getJedis().getPassword());
 		logger.info(Integer.toString(settings.getJedis().getPort()));
 		App.jedisChannelListener = new JedisMessageListener(settings.getJedis().getHost(),
 				settings.getJedis().getPort(),
@@ -231,6 +248,10 @@ public class App {
 
 	public static Settings getSettings() {
 		return settings;
+	}
+
+	public static JedisPool getJedisPool() {
+		return jedisPool;
 	}
 
 	public static JedisMessageListener getJedisChannelListener() {
