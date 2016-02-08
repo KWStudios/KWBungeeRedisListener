@@ -31,6 +31,7 @@ import org.kwstudios.play.kwbungeeredislistener.commands.ShutdownCommand;
 import org.kwstudios.play.kwbungeeredislistener.json.Settings;
 import org.kwstudios.play.kwbungeeredislistener.listener.JedisMessageListener;
 import org.kwstudios.play.kwbungeeredislistener.minigames.MinigameRequests;
+import org.kwstudios.play.kwbungeeredislistener.toolbox.ShutdownManager;
 import org.kwstudios.play.kwbungeeredislistener.toolbox.SimpleConsoleFormatter;
 
 import com.google.gson.Gson;
@@ -59,10 +60,12 @@ public class App {
 	public static void main(String[] args) {
 		setupLogger();
 
-		// ShutdownManager.registerShutdownHandler();
+		ShutdownManager.registerShutdownHandler();
 
 		logger.log(Level.INFO, "******** Starting the Listener ********");
 		reloadSettingsFile();
+
+		setupJedisPool();
 		setupJedisListener();
 
 		setupCommands();
@@ -122,7 +125,7 @@ public class App {
 		settings = gson.fromJson(reader, Settings.class);
 	}
 
-	public void setupJedisPool() {
+	public static void setupJedisPool() {
 		JedisPoolConfig poolConfig = new JedisPoolConfig();
 		if (settings.getJedis().getPassword() == null || settings.getJedis().getPassword().isEmpty()) {
 			jedisPool = new JedisPool(poolConfig, settings.getJedis().getHost(), settings.getJedis().getPort(), 0);
