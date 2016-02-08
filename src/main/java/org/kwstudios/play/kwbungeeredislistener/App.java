@@ -31,7 +31,6 @@ import org.kwstudios.play.kwbungeeredislistener.commands.ShutdownCommand;
 import org.kwstudios.play.kwbungeeredislistener.json.Settings;
 import org.kwstudios.play.kwbungeeredislistener.listener.JedisMessageListener;
 import org.kwstudios.play.kwbungeeredislistener.minigames.MinigameRequests;
-import org.kwstudios.play.kwbungeeredislistener.toolbox.ShutdownManager;
 import org.kwstudios.play.kwbungeeredislistener.toolbox.SimpleConsoleFormatter;
 
 import com.google.gson.Gson;
@@ -60,7 +59,7 @@ public class App {
 	public static void main(String[] args) {
 		setupLogger();
 
-		ShutdownManager.registerShutdownHandler();
+		// ShutdownManager.registerShutdownHandler();
 
 		logger.log(Level.INFO, "******** Starting the Listener ********");
 		reloadSettingsFile();
